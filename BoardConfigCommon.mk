@@ -71,7 +71,7 @@ TARGET_POWERHAL_VARIANT := qcom
 
 # BUTTER
 WITH_QC_PERF := true
-#TARGET_ENABLE_PREBUILT_CLANG := true
+TARGET_ENABLE_PREBUILT_CLANG := true
 
 # Recovery
 BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/samsung/klte-common/recovery/recovery_keys.c
