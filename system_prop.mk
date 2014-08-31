@@ -27,7 +27,3 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.radio.add_power_save=1 \
     persist.radio.apm_sim_not_pwdn=1 \
     persist.radio.lte_vrat_report=1
-
-# Sensors
-PRODUCT_PROPERTY_OVERRIDES += \
-    debug.sensors=1
