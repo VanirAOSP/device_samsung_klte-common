@@ -41,3 +41,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # WiFi
 PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0
+
+# for nuclearwinter compatibility
+PRODUCT_PROPERTY_OVERRIDES += \
+    qcom.thermal=thermal-engine
