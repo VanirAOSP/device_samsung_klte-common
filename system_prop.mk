@@ -30,3 +30,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.dexopt-data-only=1
+
+# for nuclearwinter compatibility
+PRODUCT_PROPERTY_OVERRIDES += \
+    qcom.thermal=thermal-engine
