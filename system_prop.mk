@@ -28,8 +28,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.radio.apm_sim_not_pwdn=1 \
     persist.radio.lte_vrat_report=1
 
-PRODUCT_PROPERTY_OVERRIDES += \
-    dalvik.vm.dexopt-data-only=1
 
 # for nuclearwinter compatibility
 PRODUCT_PROPERTY_OVERRIDES += \
