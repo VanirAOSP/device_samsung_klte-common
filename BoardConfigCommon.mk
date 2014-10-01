@@ -93,5 +93,7 @@ WIFI_DRIVER_FW_PATH_AP      := "/system/etc/wifi/bcmdhd_apsta.bin"
 TARGET_GLOBAL_CFLAGS += -DWIDEVINE_PLUGIN_PRE_NOTIFY_ERROR
 TARGET_GLOBAL_CPPFLAGS += -DWIDEVINE_PLUGIN_PRE_NOTIFY_ERROR
 
+WITH_DEXPREOPT := true
+
 # inherit from the proprietary version
 -include vendor/samsung/klte-common/BoardConfigVendor.mk
