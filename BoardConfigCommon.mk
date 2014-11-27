@@ -51,10 +51,6 @@ USE_DEVICE_SPECIFIC_CAMERA := true
 
 # CMHW
 BOARD_HARDWARE_CLASS += hardware/samsung/cmhw
-BOARD_HARDWARE_CLASS += $(LOCAL_PATH)/cmhw
-
-# Graphics
-BOARD_USES_LEGACY_MMAP := true
 
 # Lights
 TARGET_PROVIDES_LIBLIGHT := true
@@ -66,9 +62,6 @@ TARGET_USERIMAGES_USE_EXT4 := true
 # Power HAL
 TARGET_POWERHAL_SET_INTERACTIVE_EXT := $(LOCAL_PATH)/power/power_ext.c
 TARGET_POWERHAL_VARIANT := qcom
-
-# BUTTER
-TARGET_ENABLE_PREBUILT_CLANG := true
 
 # Recovery
 BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/samsung/klte-common/recovery/recovery_keys.c
