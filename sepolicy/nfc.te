@@ -1,0 +1,7 @@
+# kltespr
+/dev/bcm2079x		u:object_r:nfc_device:s0
+/data/bcmnfc		u:object_r:nfc_device:s0
+
+# everyone else (with compatibility for a symlink related to prebuilt libs?)
+/dev/pn544		u:object_r:nfc_device:s0
+/dev/pn547		u:object_r:nfc_device:s0
