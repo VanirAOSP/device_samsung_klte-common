@@ -15,6 +15,10 @@
 #inherit qcom sepolicy
 -include device/qcom/sepolicy/sepolicy.mk
 
+BOARD_SEPOLICY_DIRS += \
+    device/samsung/klte-common/sepolicy
+BOARD_SEPOLICY_UNION += \
+    nfc.te
 # inherit from common msm8974
 -include device/samsung/msm8974-common/BoardConfigCommon.mk
 
