@@ -44,7 +44,7 @@
 #include <sys/time.h>
 #include <netdb.h>
 #include <time.h>
-
+#include <new>
 #include <LocEngAdapter.h>
 
 #include <cutils/sched_policy.h>
@@ -84,6 +84,8 @@
 #define SAP_CONF_FILE            "/etc/sap.conf"
 #endif
 
+#define XTRA1_GPSONEXTRA         "xtra1.gpsonextra.net"
+
 using namespace loc_core;
 
 boolean configAlreadyRead = false;
@@ -119,17 +121,28 @@ static loc_param_s_type loc_parameter_table[] =
   {"LPP_PROFILE",                    &gps_conf.LPP_PROFILE,                    NULL, 'n'},
   {"A_GLONASS_POS_PROTOCOL_SELECT",  &gps_conf.A_GLONASS_POS_PROTOCOL_SELECT,  NULL, 'n'},
   {"SENSOR_PROVIDER",                &sap_conf.SENSOR_PROVIDER,                NULL, 'n'},
+  {"XTRA_VERSION_CHECK",             &gps_conf.XTRA_VERSION_CHECK,                  NULL, 'n'},
+  {"XTRA_SERVER_1",                  &gps_conf.XTRA_SERVER_1,                  NULL, 's'},
+  {"XTRA_SERVER_2",                  &gps_conf.XTRA_SERVER_2,                  NULL, 's'},
+  {"XTRA_SERVER_3",                  &gps_conf.XTRA_SERVER_3,                  NULL, 's'}
 };
 
 static void loc_default_parameters(void)
 {
-   /* defaults */
+   /*Defaults for gps.conf*/
    gps_conf.INTERMEDIATE_POS = 0;
    gps_conf.ACCURACY_THRES = 0;
    gps_conf.NMEA_PROVIDER = 0;
    gps_conf.SUPL_VER = 0x10000;
    gps_conf.CAPABILITIES = 0x7;
+   /* LTE Positioning Profile configuration is disable by default*/
+   gps_conf.LPP_PROFILE = 0;
+   /*By default no positioning protocol is selected on A-GLONASS system*/
+   gps_conf.A_GLONASS_POS_PROTOCOL_SELECT = 0;
+   /*XTRA version check is disabled by default*/
+   gps_conf.XTRA_VERSION_CHECK=0;
 
+   /*Defaults for sap.conf*/
    sap_conf.GYRO_BIAS_RANDOM_WALK = 0;
    sap_conf.SENSOR_ACCEL_BATCHES_PER_SEC = 2;
    sap_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH = 5;
@@ -142,26 +155,17 @@ static void loc_default_parameters(void)
    sap_conf.SENSOR_CONTROL_MODE = 0; /* AUTO */
    sap_conf.SENSOR_USAGE = 0; /* Enabled */
    sap_conf.SENSOR_ALGORITHM_CONFIG_MASK = 0; /* INS Disabled = FALSE*/
-
    /* Values MUST be set by OEMs in configuration for sensor-assisted
       navigation to work. There are NO default values */
    sap_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY = 0;
    sap_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY = 0;
    sap_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY = 0;
    sap_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY = 0;
-
    sap_conf.GYRO_BIAS_RANDOM_WALK_VALID = 0;
    sap_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID = 0;
    sap_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID = 0;
    sap_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID = 0;
    sap_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID = 0;
-
-      /* LTE Positioning Profile configuration is disable by default*/
-   gps_conf.LPP_PROFILE = 0;
-
-   /*By default no positioning protocol is selected on A-GLONASS system*/
-   gps_conf.A_GLONASS_POS_PROTOCOL_SELECT = 0;
-
    /* default provider is SSC */
    sap_conf.SENSOR_PROVIDER = 1;
 }
@@ -909,12 +913,34 @@ LocEngReportXtraServer::LocEngReportXtraServer(void* locEng,
     LocMsg(), mLocEng(locEng), mMaxLen(maxlength),
     mServers(new char[3*(mMaxLen+1)])
 {
+    char * cptr = mServers;
     memset(mServers, 0, 3*(mMaxLen+1));
-    strlcpy(mServers, url1, mMaxLen);
-    strlcpy(&(mServers[mMaxLen+1]), url2, mMaxLen);
-    strlcpy(&(mServers[(mMaxLen+1)<<1]), url3, mMaxLen);
+
+    // Override modem URLs with uncommented gps.conf urls
+    if( gps_conf.XTRA_SERVER_1[0] != '\0' ) {
+        url1 = &gps_conf.XTRA_SERVER_1[0];
+    }
+    if( gps_conf.XTRA_SERVER_2[0] != '\0' ) {
+        url2 = &gps_conf.XTRA_SERVER_2[0];
+    }
+    if( gps_conf.XTRA_SERVER_3[0] != '\0' ) {
+        url3 = &gps_conf.XTRA_SERVER_3[0];
+    }
+    // copy non xtra1.gpsonextra.net URLs into the forwarding buffer.
+    if( NULL == strcasestr(url1, XTRA1_GPSONEXTRA) ) {
+        strlcpy(cptr, url1, mMaxLen + 1);
+        cptr += mMaxLen + 1;
+    }
+    if( NULL == strcasestr(url2, XTRA1_GPSONEXTRA) ) {
+        strlcpy(cptr, url2, mMaxLen + 1);
+        cptr += mMaxLen + 1;
+    }
+    if( NULL == strcasestr(url3, XTRA1_GPSONEXTRA) ) {
+        strlcpy(cptr, url3, mMaxLen + 1);
+    }
     locallog();
 }
+
 void LocEngReportXtraServer::proc() const {
     loc_eng_xtra_data_s_type* locEngXtra =
         &(((loc_eng_data_s_type*)mLocEng)->xtra_module_data);
@@ -1556,52 +1582,50 @@ static int loc_eng_reinit(loc_eng_data_s_type &loc_eng_data)
 {
     ENTRY_LOG();
     int ret_val = LOC_API_ADAPTER_ERR_SUCCESS;
+    LocEngAdapter* adapter = loc_eng_data.adapter;
 
-    if (LOC_API_ADAPTER_ERR_SUCCESS == ret_val) {
-        LOC_LOGD("loc_eng_reinit reinit() successful");
+    adapter->sendMsg(new LocEngSuplVer(adapter, gps_conf.SUPL_VER));
+    adapter->sendMsg(new LocEngLppConfig(adapter, gps_conf.LPP_PROFILE));
+    adapter->sendMsg(new LocEngSensorControlConfig(adapter, sap_conf.SENSOR_USAGE,
+                                                   sap_conf.SENSOR_PROVIDER));
+    adapter->sendMsg(new LocEngAGlonassProtocol(adapter, gps_conf.A_GLONASS_POS_PROTOCOL_SELECT));
 
-        LocEngAdapter* adapter = loc_eng_data.adapter;
-        adapter->sendMsg(new LocEngSuplVer(adapter, gps_conf.SUPL_VER));
-        adapter->sendMsg(new LocEngLppConfig(adapter, gps_conf.LPP_PROFILE));
-        adapter->sendMsg(new LocEngSensorControlConfig(adapter, sap_conf.SENSOR_USAGE,
-                                                       sap_conf.SENSOR_PROVIDER));
-        adapter->sendMsg(new LocEngAGlonassProtocol(adapter, gps_conf.A_GLONASS_POS_PROTOCOL_SELECT));
-
-        /* Make sure at least one of the sensor property is specified by the user in the gps.conf file. */
-        if( sap_conf.GYRO_BIAS_RANDOM_WALK_VALID ||
-            sap_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
-            sap_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
-            sap_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
-            sap_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID )
-        {
-            adapter->sendMsg(new LocEngSensorProperties(adapter,
-                                                        sap_conf.GYRO_BIAS_RANDOM_WALK_VALID,
-                                                        sap_conf.GYRO_BIAS_RANDOM_WALK,
-                                                        sap_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
-                                                        sap_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY,
-                                                        sap_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
-                                                        sap_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY,
-                                                        sap_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
-                                                        sap_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY,
-                                                        sap_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
-                                                        sap_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY));
-        }
-
-        adapter->sendMsg(new LocEngSensorPerfControlConfig(adapter,
-                                                           sap_conf.SENSOR_CONTROL_MODE,
-                                                           sap_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH,
-                                                           sap_conf.SENSOR_ACCEL_BATCHES_PER_SEC,
-                                                           sap_conf.SENSOR_GYRO_SAMPLES_PER_BATCH,
-                                                           sap_conf.SENSOR_GYRO_BATCHES_PER_SEC,
-                                                           sap_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH_HIGH,
-                                                           sap_conf.SENSOR_ACCEL_BATCHES_PER_SEC_HIGH,
-                                                           sap_conf.SENSOR_GYRO_SAMPLES_PER_BATCH_HIGH,
-                                                           sap_conf.SENSOR_GYRO_BATCHES_PER_SEC_HIGH,
-                                                           sap_conf.SENSOR_ALGORITHM_CONFIG_MASK));
-
-        adapter->sendMsg(new LocEngEnableData(adapter, NULL, 0, (agpsStatus ? 1:0)));
+    /* Make sure at least one of the sensor property is specified by the user in the gps.conf file. */
+    if( sap_conf.GYRO_BIAS_RANDOM_WALK_VALID ||
+        sap_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
+        sap_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
+        sap_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
+        sap_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID ) {
+        adapter->sendMsg(new LocEngSensorProperties(adapter,
+                                                    sap_conf.GYRO_BIAS_RANDOM_WALK_VALID,
+                                                    sap_conf.GYRO_BIAS_RANDOM_WALK,
+                                                    sap_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
+                                                    sap_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY,
+                                                    sap_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
+                                                    sap_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY,
+                                                    sap_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
+                                                    sap_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY,
+                                                    sap_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
+                                                    sap_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY));
     }
 
+    adapter->sendMsg(new LocEngSensorPerfControlConfig(adapter,
+                                                       sap_conf.SENSOR_CONTROL_MODE,
+                                                       sap_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH,
+                                                       sap_conf.SENSOR_ACCEL_BATCHES_PER_SEC,
+                                                       sap_conf.SENSOR_GYRO_SAMPLES_PER_BATCH,
+                                                       sap_conf.SENSOR_GYRO_BATCHES_PER_SEC,
+                                                       sap_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH_HIGH,
+                                                       sap_conf.SENSOR_ACCEL_BATCHES_PER_SEC_HIGH,
+                                                       sap_conf.SENSOR_GYRO_SAMPLES_PER_BATCH_HIGH,
+                                                       sap_conf.SENSOR_GYRO_BATCHES_PER_SEC_HIGH,
+                                                       sap_conf.SENSOR_ALGORITHM_CONFIG_MASK));
+
+    adapter->sendMsg(new LocEngEnableData(adapter, NULL, 0, (agpsStatus ? 1:0)));
+
+    loc_eng_xtra_version_check(loc_eng_data, gps_conf.XTRA_VERSION_CHECK);
+
+    LOC_LOGD("loc_eng_reinit reinit() successful");
     EXIT_LOG(%d, ret_val);
     return ret_val;
 }
@@ -1701,7 +1725,9 @@ static int loc_eng_start_handler(loc_eng_data_s_type &loc_eng_data)
        ret_val = loc_eng_data.adapter->startFix();
 
        if (ret_val == LOC_API_ADAPTER_ERR_SUCCESS ||
-           ret_val == LOC_API_ADAPTER_ERR_ENGINE_DOWN)
+           ret_val == LOC_API_ADAPTER_ERR_ENGINE_DOWN ||
+           ret_val == LOC_API_ADAPTER_ERR_PHONE_OFFLINE ||
+           ret_val == LOC_API_ADAPTER_ERR_INTERNAL)
        {
            loc_eng_data.adapter->setInSession(TRUE);
            loc_inform_gps_status(loc_eng_data, GPS_STATUS_SESSION_BEGIN);
@@ -1962,7 +1988,6 @@ static int loc_eng_get_zpp_handler(loc_eng_data_s_type &loc_eng_data)
    GpsLocationExtended locationExtended;
    memset(&locationExtended, 0, sizeof (GpsLocationExtended));
    locationExtended.size = sizeof(locationExtended);
-   memset(&location, 0, sizeof location);
 
    ret_val = loc_eng_data.adapter->getZpp(location.gpsLocation, tech_mask);
   //Mark the location source as from ZPP
