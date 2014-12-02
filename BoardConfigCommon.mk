@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#inherit qcom sepolicy
--include device/qcom/sepolicy/sepolicy.mk
-
 # inherit from common msm8974
 -include device/samsung/msm8974-common/BoardConfigCommon.mk
 
