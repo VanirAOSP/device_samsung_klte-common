@@ -93,6 +93,9 @@ on post-fs-data
     chown media_rw media_rw /data/media
 
     mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
+    
+    # Create directory used by radio subsystem
+    mkdir /data/radio 0770 radio radio
 
     # Create the directories used by the Wireless subsystem
     mkdir /data/misc/wifi 0770 wifi wifi
