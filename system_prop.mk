@@ -34,10 +34,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.radio.lte_vrat_report=1 \
     ro.telephony.ril_class=KlteRIL
 
-
-# for nuclearwinter compatibility
+# Sensors
 PRODUCT_PROPERTY_OVERRIDES += \
-    qcom.thermal=thermal-engine
+    debug.sensors=1
 
 # WiFi
 PRODUCT_PROPERTY_OVERRIDES += \
