@@ -44,3 +44,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # for nuclearwinter compatibility
 PRODUCT_PROPERTY_OVERRIDES += \
     qcom.thermal=thermal-engine
+
+# Tethering
+RODUCT_PROPERTY_OVERRIDES += \
+	net.tethering.noprovisioning=true
+	
