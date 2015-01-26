@@ -28,6 +28,7 @@
 import init.qcom.usb.rc
 
 on early-init
+    setprop sys.boot_completed 0
     # Increase max readahead size to 512 KB
     write /sys/block/mmcblk0/queue/read_ahead_kb 512
     write /sys/block/mmcblk0/queue/scheduler noop
@@ -181,7 +182,7 @@ on post-fs-data
     mkdir /data/misc/location/mq 0770 gps gps
     mkdir /data/misc/location/quipc 0770 system gps
     mkdir /data/misc/location/xtwifi 0770 gps gps
-
+f1277f27e81f0f8761fb42c7e4db05c0457e2d52
     #Create directory from IMS services
     mkdir /data/shared 0755
     chown system system /data/shared
