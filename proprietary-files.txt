@@ -269,6 +269,7 @@ lib/hw/sensorhubs.msm8974.so
 # Time services
 -app/TimeService/TimeService.apk
 bin/time_daemon
+lib/libTimeService.so
 -vendor/lib/libtime_genoff.so
 -lib/libTimeService.so
 
