@@ -271,7 +271,6 @@ lib/hw/sensorhubs.msm8974.so
 bin/time_daemon
 lib/libTimeService.so
 -vendor/lib/libtime_genoff.so
--lib/libTimeService.so
 
 # Wi-Fi
 etc/wifi/bcmdhd_apsta.bin

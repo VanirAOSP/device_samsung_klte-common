@@ -1,18 +1,12 @@
 # Audio
 PRODUCT_PROPERTY_OVERRIDES += \
+    av.offload.enable=false \
     persist.audio.fluence.speaker=true \
     persist.audio.fluence.voicecall=true \
     persist.audio.fluence.voicerec=false \
     ro.qc.sdk.audio.fluencetype=fluence \
-    mm.enable.smoothstreaming=true \
-    av.streaming.offload.enable=true \
-    use.voice.path.for.pcm.voip=true \
-    audio.offload.multiple.enabled=true \
-    audio.offload.gapless.enabled=true \
-    tunnel.audio.encode=true \
-    media.aac_51_output_enabled=true \
-    audio.offload.pcm.16bit.enable=true \
-    audio.offload.pcm.24bit.enable=true
+    use.voice.path.for.pcm.voip=false \
+    use.dedicated.device.for.voip=true
 
 # Display
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -39,10 +33,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.radio.lte_vrat_report=1 \
     ro.telephony.ril_class=KlteRIL
 
-# Perf
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.vendor.extension_library=/vendor/lib/libqti-perfd-client.so
-
 # Sensors
 PRODUCT_PROPERTY_OVERRIDES += \
     debug.sensors=1
@@ -51,11 +41,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0
 
-# for nuclearwinter compatibility
-PRODUCT_PROPERTY_OVERRIDES += \
-    qcom.thermal=thermal-engine
-
 # Tethering
-RODUCT_PROPERTY_OVERRIDES += \
-	net.tethering.noprovisioning=true
-	
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    net.tethering.noprovisioning=true
+
