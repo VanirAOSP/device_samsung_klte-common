@@ -232,7 +232,7 @@
                    width="3840"
                    height="2160"
                    frameRate="30" />
-            <!-- audio setting is ignored -->
+    <!-- audio setting is ignored -->
             <Audio codec="aac"
                    bitRate="256000"
                    sampleRate="48000"
