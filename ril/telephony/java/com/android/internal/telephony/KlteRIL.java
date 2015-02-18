@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, The CyanogenMod Project. All rights reserved.
+ * Copyright (C) 2012-2014 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,7 @@ import com.android.internal.telephony.uicc.IccCardApplicationStatus;
 import com.android.internal.telephony.uicc.IccCardStatus;
 
 /**
- * RIL customization for Qualcomm Galaxy S5 LTE devices
- *
+ * Qualcomm RIL for the Samsung msm8974 family.
  * {@hide}
  */
 public class KlteRIL extends RIL implements CommandsInterface {
@@ -100,12 +99,11 @@ public class KlteRIL extends RIL implements CommandsInterface {
             appStatus.pin1_replaced  = p.readInt();
             appStatus.pin1           = appStatus.PinStateFromRILInt(p.readInt());
             appStatus.pin2           = appStatus.PinStateFromRILInt(p.readInt());
-            p.readInt(); // pin1_num_retries
-            p.readInt(); // puk1_num_retries
-            p.readInt(); // pin2_num_retries
-            p.readInt(); // puk2_num_retries
-            p.readInt(); // perso_unblock_retries
-
+            p.readInt(); // remaining_count_pin1 - pin1_num_retries
+            p.readInt(); // remaining_count_puk1 - puk1_num_retries
+            p.readInt(); // remaining_count_pin2 - pin2_num_retries
+            p.readInt(); // remaining_count_puk2 - puk2_num_retries
+            p.readInt(); // - perso_unblock_retries
             cardStatus.mApplications[i] = appStatus;
         }
         // for sprint gsm(lte) only sim
@@ -364,7 +362,7 @@ public class KlteRIL extends RIL implements CommandsInterface {
         }
         return response;
     }
-
+    
     /**
      * Set audio parameter "wb_amr" for HD-Voice (Wideband AMR).
      *
@@ -424,7 +422,7 @@ public class KlteRIL extends RIL implements CommandsInterface {
 
         send(rr);
     }
-
+    
     @Override
     public void
     acceptCall (Message result) {
@@ -440,7 +438,7 @@ public class KlteRIL extends RIL implements CommandsInterface {
         send(rr);
     }
 
-
+    
     // Workaround for Samsung CDMA "ring of death" bug:
     //
     // Symptom: As soon as the phone receives notice of an incoming call, an
