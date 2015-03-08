@@ -88,6 +88,21 @@ PRODUCT_PACKAGES += \
     NfcNci \
     Tag
 
+# OMX
+PRODUCT_PACKAGES += \
+    libdashplayer \
+    libOmxVdec \
+    libOmxVenc \
+    libOmxAacEnc \
+    libOmxAmrEnc \
+    libOmxEvrcEnc \
+    libOmxQcelp13Enc \
+    libstagefrighthw \
+    qcmediaplayer
+
+PRODUCT_BOOT_JARS += \
+    qcmediaplayer
+
 # Ramdisk
 PRODUCT_PACKAGES += \
     fstab.qcom \
