@@ -17,6 +17,9 @@
 /sys/devices/virtual/graphics/fb0/rgb                   u:object_r:sysfs_display:s0
 /sys/devices/virtual/lcd/panel/power_reduce             u:object_r:sysfs_display:s0
 
+# Domain
+/system/bin/macloader                                   u:object_r:macloader_exec:s0
+
 # GPS
 /data/misc/gsiff_ctrl_q                                 u:object_r:location_data_file:s0
 
@@ -26,6 +29,11 @@
 # NFC
 /dev/bcm2079x                                           u:object_r:nfc_device:s0
 /dev/pn547                                              u:object_r:nfc_device:s0
+
+# RIL
+/efs/FactoryApp(/.*)?                                   u:object_r:efs_file:s0
+/efs/imei                                               u:object_r:efs_file:s0
+/efs/imei/mps_code.dat                                  u:object_r:efs_file:s0
 
 # SEC
 /sys/devices/virtual/sec/sec_key/hall_irq_ctrl          u:object_r:sysfs_sec:s0
@@ -46,11 +54,3 @@
 
 # Vold
 /etc/blkid.tab                                          u:object_r:system_file:s0
-
-# Domain
-/system/bin/macloader                                   u:object_r:macloader_exec:s0
-
-# RIL
-/efs/FactoryApp(/.*)?                                   u:object_r:efs_file:s0
-/efs/imei                                               u:object_r:efs_file:s0
-/efs/imei/mps_code.dat                                  u:object_r:efs_file:s0
