@@ -25,6 +25,9 @@
 # GPS
 /data/misc/gsiff_ctrl_q                                 u:object_r:location_data_file:s0
 
+# Iptables
+/system/bin/iptables                                   u:object_r:iptables_exec:s0
+
 # Mpdecision
 /data/system/default_values                             u:object_r:mpctl_data_file:s0
 
