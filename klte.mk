@@ -56,17 +56,17 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/audio/mixer_paths.xml:system/etc/mixer_paths.xml
 
 # Camera
-PRODUCT_PACKAGES += \
-    camera.msm8974 \
-    libxml2
+# PRODUCT_PACKAGES += \
+#    camera.msm8974 \
+#    libxml2
 
 # Doze
 PRODUCT_PACKAGES += \
     SamsungDoze
 
 # GPS
-PRODUCT_PACKAGES += \
-    gps.msm8974
+# PRODUCT_PACKAGES += \
+#    gps.msm8974
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/flp.conf:/system/etc/flp.conf \
