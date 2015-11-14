@@ -58,7 +58,6 @@ PRODUCT_COPY_FILES += \
 # Camera
 PRODUCT_PACKAGES += \
     camera.msm8974 \
-    libboringssl-compat \
     libstlport \
     libxml2
 
@@ -98,6 +97,10 @@ PRODUCT_PACKAGES += \
     com.android.nfc_extras \
     NfcNci \
     Tag
+
+# Radio
+PRODUCT_PACKAGES += \
+    libril_shim
 
 # Ramdisk
 PRODUCT_PACKAGES += \
