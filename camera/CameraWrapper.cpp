@@ -31,7 +31,7 @@
 #include <hardware/hardware.h>
 #include <hardware/camera.h>
 #include <camera/Camera.h>
-#include <camera/CameraParameters2.h>
+#include <camera/CameraParameters.h>
 
 static android::Mutex gCameraWrapperLock;
 static camera_module_t *gVendorModule = 0;
@@ -140,12 +140,11 @@ static char *camera_fixup_getparams(int __attribute__((unused)) id,
      * this can be turned off, fixup the params to tell the Camera
      * that it really is okay to turn it off.
      */
-
-    const char* hfrValues = params.get(android::CameraParameters::KEY_SUPPORTED_VIDEO_HIGH_FRAME_RATE_MODES);
-    if (hfrValues && *hfrValues && ! strstr(hfrValues, "off")) {
-        char tmp[strlen(hfrValues) + 4 + 1];
-        sprintf(tmp, "%s,off", hfrValues);
-        params.set(android::CameraParameters::KEY_SUPPORTED_VIDEO_HIGH_FRAME_RATE_MODES, tmp);
+    const char *hfrModeValues = params.get(KEY_VIDEO_HFR_VALUES);
+    if (hfrModeValues && !strstr(hfrModeValues, "off")) {
+        char hfrModes[strlen(hfrModeValues) + 4 + 1];
+        sprintf(hfrModes, "%s,off", hfrModeValues);
+        params.set(KEY_VIDEO_HFR_VALUES, hfrModes);
     }
 
     /* Enforce video-snapshot-supported to true */
