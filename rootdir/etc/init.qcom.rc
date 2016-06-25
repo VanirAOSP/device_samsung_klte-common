@@ -139,10 +139,16 @@ on post-fs-data
     chown system system /sys/class/input/input2/enabled
 
     # Vibrator
-    chmod 0644 /sys/class/timed_output/vibrator/enable
-    chown system system /sys/class/timed_output/vibrator/enable
-    chmod 0644 /sys/class/timed_output/vibrator/intensity
-    chown system system /sys/class/timed_output/vibrator/intensity
+    chmod 0644 /sys/class/timed_output/vibrator/pwm_value
+    chown root system /sys/class/timed_output/vibrator/pwm_value
+    chmod 0644 /sys/class/timed_output/vibrator/pwm_max
+    chown root system /sys/class/timed_output/vibrator/pwm_max
+    chmod 0644 /sys/class/timed_output/vibrator/pwm_min
+    chown root system /sys/class/timed_output/vibrator/pwm_min
+    chmod 0644 /sys/class/timed_output/vibrator/pwm_default
+    chown root system /sys/class/timed_output/vibrator/pwm_default
+    chmod 0644 /sys/class/timed_output/vibrator/pwm_threshold
+    chown root system /sys/class/timed_output/vibrator/pwm_threshold
 
     #Create the symlink to qcn wpa_supplicant folder for ar6000 wpa_supplicant
     mkdir /data/system 0775 system system
@@ -947,17 +953,14 @@ service qseecomd /system/bin/qseecomd
     group system
 
 service mpdecision /system/bin/mpdecision --avg_comp
-   class main
-   user root
-   disabled
+    user root
+    group system
+    disabled
 
-service thermal-engine /system/vendor/bin/thermal-engine
-   class main
-   user root
-   socket thermal-send-client stream 0666 system system
-   socket thermal-recv-client stream 0660 system system
-   socket thermal-recv-passive-client stream 0666 system system
-   group root
+service thermal-engine /system/bin/thermal-engine
+    class core
+    user root
+    group radio system
 
 service time_daemon /system/bin/time_daemon
     class late_start

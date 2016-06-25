@@ -1,4 +1,4 @@
-# Copyright (C) 2016 The CyanogenMod Project
+# Copyright (C) 2014 The CyanogenMod Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02000000 --tags_offset 0x01e00000
 TARGET_KERNEL_CONFIG := msm8974_sec_defconfig
 TARGET_KERNEL_SELINUX_CONFIG := selinux_defconfig
 TARGET_KERNEL_SOURCE := kernel/samsung/klte
-TARGET_KERNEL_CROSS_COMPILE_PREFIX := arm-linux-androideabi-
 
 # Audio
 BOARD_HAVE_NEW_QCOM_CSDCLIENT := true
@@ -46,7 +45,8 @@ BOARD_HAVE_BLUETOOTH_BCM := true
 USE_DEVICE_SPECIFIC_CAMERA := true
 
 # CMHW
-BOARD_HARDWARE_CLASS := device/samsung/klte-common/cmhw
+BOARD_HARDWARE_CLASS += device/samsung/klte-common/cmhw
+BOARD_HARDWARE_CLASS += hardware/samsung/cmhw
 
 # Lights
 TARGET_PROVIDES_LIBLIGHT := true
