@@ -47,15 +47,11 @@ on early-init
 on init
 
     # Support legacy paths
-    symlink /sdcard /mnt/sdcard
     symlink /sdcard /storage/sdcard0
 
     write /proc/sys/vm/page-cluster 0
 
 on fs
-    write /sys/devices/msm_sdcc.1/mmc_host/mmc1/power/control on
-    write /sys/devices/msm_sdcc.3/mmc_host/mmc2/power/control on
-
     mount_all fstab.qcom
     swapon_all fstab.qcom
 
@@ -160,8 +156,6 @@ on post-fs-data
     # Enable the setgid bit on the directory
     chmod 2770 /data/audio
 
-    setprop vold.post_fs_data_done 1
-
     #Create a folder for SRS to be able to create a usercfg file
     mkdir /data/data/media 0770 media media
 
@@ -228,15 +222,6 @@ on post-fs-data
     chown system root /data/.psm.info
     chmod 0660 /data/.psm.info
 
-    # icd
-    exec icd_check
-    chown system system /dev/icd
-    chmod 0644 /dev/icd
-    write /dev/icdr 0
-    chown system system /dev/icdr
-    chmod 0644 /dev/icdr
-    chown system system /dev/tzic
-
     # MTP permission
     chmod 0660 /dev/usb_mtp_gadget
     chown system mtp /dev/usb_mtp_gadget
@@ -260,6 +245,8 @@ on post-fs-data
 
     chown system camera /sys/class/flash/flash/flash_power
     chmod 660 /sys/class/flash/flash/flash_power
+
+    setprop vold.post_fs_data_done 1
 
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
@@ -379,18 +366,7 @@ on boot
     write /proc/sys/net/ipv6/conf/rmnet5/accept_ra 2
     write /proc/sys/net/ipv6/conf/rmnet6/accept_ra 2
     write /proc/sys/net/ipv6/conf/rmnet7/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio0/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio1/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio2/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio3/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio4/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio5/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio6/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio7/accept_ra 2
     write /proc/sys/net/ipv6/conf/rmnet_usb0/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb1/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb2/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb3/accept_ra 2
 
     # To prevent out of order acknowledgements from making
     # connection tracking to treat them as not belonging to
@@ -606,19 +582,19 @@ on boot
     chown system system /sys/class/sec/tsp/input/enabled
 
     # Permissions for Camera
-   chown root system /sys/class/camera/rear/rear_camantibanding
-   chown system radio /sys/class/camera/rear/rear_camfw
-   chown system radio /sys/class/camera/rear/rear_camfw_full
-   chown system radio /sys/class/camera/rear/rear_camfw_load
-   chown system radio /sys/class/camera/rear/rear_camtype
-   chown system radio /sys/class/camera/rear/rear_corever
-   chown system radio /sys/class/camera/rear/rear_companionfw_full
-   chown system radio /sys/class/camera/rear/rear_calcheck
-   chown system radio /sys/class/camera/rear/rear_fwcheck
-   chown system radio /sys/class/camera/rear/isp_core
-   chown system radio /sys/class/camera/flash/rear_flash
-   chown system radio /sys/class/camera/front/front_camfw
-   chown system radio /sys/class/camera/front/front_camtype
+    chown root system /sys/class/camera/rear/rear_camantibanding
+    chown system radio /sys/class/camera/rear/rear_camfw
+    chown system radio /sys/class/camera/rear/rear_camfw_full
+    chown system radio /sys/class/camera/rear/rear_camfw_load
+    chown system radio /sys/class/camera/rear/rear_camtype
+    chown system radio /sys/class/camera/rear/rear_corever
+    chown system radio /sys/class/camera/rear/rear_companionfw_full
+    chown system radio /sys/class/camera/rear/rear_calcheck
+    chown system radio /sys/class/camera/rear/rear_fwcheck
+    chown system radio /sys/class/camera/rear/isp_core
+    chown system radio /sys/class/camera/flash/rear_flash
+    chown system radio /sys/class/camera/front/front_camfw
+    chown system radio /sys/class/camera/front/front_camtype
 
     #OTG Test
     chown system radio /sys/class/host_notify/usb_otg/booster
@@ -933,7 +909,7 @@ service fingerprintd /system/bin/fingerprintd
 service qcamerasvr /system/bin/mm-qcamera-daemon
     class main
     user camera
-    group camera system inet input graphics radio sdcard_rw sdcard_r media_rw shell log
+    group camera system inet input graphics net_bt_stack
 
 service qseecomd /system/bin/qseecomd
     class late_start
@@ -941,14 +917,18 @@ service qseecomd /system/bin/qseecomd
     group system
 
 service mpdecision /system/bin/mpdecision --avg_comp
+    class main
     user root
     group system
     disabled
 
 service thermal-engine /system/bin/thermal-engine
-    class core
-    user root
-    group radio system
+   class main
+   user root
+   socket thermal-send-client stream 0666 system system
+   socket thermal-recv-client stream 0660 system system
+   socket thermal-recv-passive-client stream 0666 system system
+   group root
 
 service time_daemon /system/bin/time_daemon
     class late_start
@@ -979,9 +959,6 @@ service qmuxd /system/bin/qmuxd
     user radio
     group radio audio bluetooth gps qcom_diag log
 
-service netmgrd /system/bin/netmgrd
-    class main
-
 service wpa_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
     -I/system/etc/wifi/wpa_supplicant_overlay.conf \
@@ -994,6 +971,7 @@ service wpa_supplicant /system/bin/wpa_supplicant \
     class main
     socket wpa_wlan0 dgram 660 wifi wifi
     disabled
+    group system wakelock
     oneshot
 
 service p2p_supplicant /system/bin/wpa_supplicant \
@@ -1010,68 +988,21 @@ service p2p_supplicant /system/bin/wpa_supplicant \
     class main
     socket wpa_wlan0 dgram 660 wifi wifi
     disabled
+    group system wakelock
     oneshot
-
-service dhcpcd_wlan0 /system/bin/dhcpcd -aABDKL
-    class main
-    disabled
-    oneshot
-
-service dhcpcd_p2p /system/bin/dhcpcd -aABKL
-    class main
-    disabled
-    oneshot
-
-service dhcpcd_bt-pan /system/bin/dhcpcd -ABKL
-    class main
-    disabled
-    oneshot
-
-service dhcpcd_eth0 /system/bin/dhcpcd -ABDKL
-    class main
-    disabled
-    oneshot
-
-service iprenew_wlan0 /system/bin/dhcpcd -n
-    class main
-    disabled
-    oneshot
-
-service iprenew_p2p /system/bin/dhcpcd -n
-    class main
-    disabled
-    oneshot
-
-service iprenew_bt-pan /system/bin/dhcpcd -n
-    class main
-    disabled
-    oneshot
-
-service dhcpcd_bnep1 /system/bin/dhcpcd -BKLG
-    disabled
-    oneshot
-
-service dhcpcd_bnep2 /system/bin/dhcpcd -BKLG
-    disabled
-    oneshot
-
-service dhcpcd_bnep3 /system/bin/dhcpcd -BKLG
-    disabled
-    oneshot
-
-service dhcpcd_bnep4 /system/bin/dhcpcd -BKLG
-    disabled
-    oneshot
-
-on property:init.svc.wpa_supplicant=stopped
-    stop dhcpcd
-
-on property:init.svc.p2p_supplicant=stopped
-    stop dhcpcd
 
 service macloader /system/bin/macloader
     class main
     oneshot
+
+service ril-daemon /system/bin/rild
+    class main
+    socket rild stream 660 root radio
+    socket sap_uim_socket1 stream 660 bluetooth bluetooth
+    socket rild-debug stream 660 radio system
+    user root
+    group radio cache inet misc audio log wakelock qcom_diag
+
 
 on property:init.svc.macloader=stopped
     chown system root /data/.rev
@@ -1081,7 +1012,7 @@ on property:sys.boot_completed=1
     setprop sys.io.scheduler bfq
 
     # Configure the hardware properly
-    write /sys/module/lpm_resources/enable_low_power/l2 4
+    write /sys/module/lpm_levels/enable_low_power/l2 4
     write /sys/module/msm_pm/modes/cpu0/power_collapse/suspend_enabled 1
     write /sys/module/msm_pm/modes/cpu1/power_collapse/suspend_enabled 1
     write /sys/module/msm_pm/modes/cpu2/power_collapse/suspend_enabled 1
@@ -1109,6 +1040,12 @@ on property:sys.boot_completed=1
     write /sys/module/msm_thermal/core_control/enabled 1
 
     # Configure the CPU governor
+    chown root system /sys/devices/system/cpu/cpu1/online
+    chown root system /sys/devices/system/cpu/cpu2/online
+    chown root system /sys/devices/system/cpu/cpu3/online
+    chmod 664 /sys/devices/system/cpu/cpu1/online
+    chmod 664 /sys/devices/system/cpu/cpu2/online
+    chmod 664 /sys/devices/system/cpu/cpu3/online
     write /sys/devices/system/cpu/cpu1/online 1
     write /sys/devices/system/cpu/cpu2/online 1
     write /sys/devices/system/cpu/cpu3/online 1
@@ -1131,15 +1068,6 @@ on property:sys.boot_completed=1
     write /sys/module/msm_thermal/core_control/enabled 1
     write /sys/devices/system/cpu/cpufreq/interactive/up_threshold_any_cpu_load 75
     write /sys/devices/system/cpu/cpufreq/interactive/up_threshold_any_cpu_freq 1728000
-    chown root system /sys/devices/system/cpu/mfreq
-    chmod 220 /sys/devices/system/cpu/mfreq
-    chown root system /sys/devices/system/cpu/cpu1/online
-    chown root system /sys/devices/system/cpu/cpu2/online
-    chown root system /sys/devices/system/cpu/cpu3/online
-    chmod 664 /sys/devices/system/cpu/cpu1/online
-    chmod 664 /sys/devices/system/cpu/cpu2/online
-    chmod 664 /sys/devices/system/cpu/cpu3/online
-    write /dev/cpuctl/apps/cpu.notify_on_migrate 1
 
     # Configure the cpu-boost module
     write /sys/module/cpu_boost/parameters/boost_ms 20
