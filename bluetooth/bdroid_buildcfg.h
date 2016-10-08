@@ -21,4 +21,6 @@
 #define BTM_DEF_LOCAL_NAME   "Samsung Galaxy S5"
 #define BTIF_MAX_PCM_ITER_NUM_PER_TICK  10
 
+#define BTA_DISABLE_DELAY 1000 /* in milliseconds */
+
 #endif
