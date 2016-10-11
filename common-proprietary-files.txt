@@ -31,6 +31,9 @@ vendor/lib/rfsa/adsp/libfastcvadsp_skel.so
 vendor/lib/rfsa/adsp/libfastcvadsp.so
 vendor/lib/rfsa/adsp/libscveT2T_skel.so
 
+# Bluetooth firmware
+vendor/firmware/bcm4350_V0375.0768.hcd
+
 # Camera
 bin/mm-qcamera-daemon
 lib/hw/camera.msm8974.so:lib/hw/camera.vendor.msm8974.so
@@ -224,6 +227,22 @@ vendor/lib/libwvm.so
 vendor/lib/libWVStreamControlAPI_L1.so
 vendor/lib/mediadrm/libwvdrmengine.so
 
+# GPS
+system/etc/clatd.conf
+system/etc/gps.conf
+system/etc/izat.conf
+system/etc/sap.conf
+system/lib/hw/gps.default.so
+system/lib/libgps.utils.so
+system/lib/libloc_api_v02.so
+system/lib/libloc_core.so
+system/lib/libloc_ds_api.so
+system/lib/libloc_eng.so
+system/vendor/lib/hw/flp.default.so
+system/vendor/lib/libgeofence.so
+system/vendor/lib/libizat_core.so
+system/vendor/lib/liblbs_core.so
+
 # Graphics firmware
 etc/firmware/a330_pfp.fw
 etc/firmware/a330_pm4.fw
@@ -270,9 +289,16 @@ vendor/lib/libTimeService.so
 
 # Wi-Fi
 etc/wifi/bcmdhd_apsta.bin
+etc/wifi/bcmdhd_ibss.bin
 etc/wifi/bcmdhd_mfg.bin
 etc/wifi/bcmdhd_sta.bin
 etc/wifi/cred.conf
 etc/wifi/nvram_mfg.txt
+etc/wifi/nvram_mfg.txt_a0
+etc/wifi/nvram_mfg.txt_muratafem1
+etc/wifi/nvram_mfg.txt_semco3rd
 etc/wifi/nvram_net.txt
+etc/wifi/nvram_net.txt_a0
+etc/wifi/nvram_net.txt_muratafem1
+etc/wifi/nvram_net.txt_semco3rd
 etc/wifi/wpa_supplicant.conf
