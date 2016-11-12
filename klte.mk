@@ -109,7 +109,7 @@ PRODUCT_PACKAGES += \
 
 # Radio
 PRODUCT_PACKAGES += \
-    libril_shim \
+    libshim_ril \
     libprotobuf-cpp-full
 
 # Ramdisk
@@ -123,6 +123,10 @@ PRODUCT_PACKAGES += \
 # Thermal
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/thermal-engine-8974.conf:system/etc/thermal-engine-8974.conf
+
+# Widevine
+PRODUCT_PACKAGES += \
+    libshim_wvm
 
 # Wifi
 PRODUCT_PACKAGES += \
