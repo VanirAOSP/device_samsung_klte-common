@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SAMSUNG_LIGHTS_H
-#define SAMSUNG_LIGHTS_H
+#ifndef SAMSUNG_CONSUMERIR_H
+#define SAMSUNG_CONSUMERIR_H
 
 /*
  * Board specific nodes
@@ -24,9 +24,24 @@
  * symlink to the locations given here, or override this header in your
  * device tree.
  */
-#define PANEL_BRIGHTNESS_NODE "/sys/class/leds/lcd-backlight/brightness"
-#define PANEL_MAX_BRIGHTNESS_NODE "/sys/class/leds/lcd-backlight/max_brightness"
-#define BUTTON_BRIGHTNESS_NODE "/sys/class/sec/sec_touchkey/brightness"
-#define LED_BLINK_NODE "/sys/class/sec/led/led_blink"
+#define IR_PATH "/sys/class/sec/sec_ir/ir_send"
 
-#endif // SAMSUNG_LIGHTS_H
+/*
+ * Board specific configs
+ *
+ * If your device needs a different configuration, you
+ * can override this header in your device tree
+ */
+// Some devices need MS_IR_SIGNAL to avoid ms to pulses conversionn
+#define MS_IR_SIGNAL
+
+static const consumerir_freq_range_t consumerir_freqs[] = {
+    {.min = 30000, .max = 30000},
+    {.min = 33000, .max = 33000},
+    {.min = 36000, .max = 36000},
+    {.min = 38000, .max = 38000},
+    {.min = 40000, .max = 40000},
+    {.min = 56000, .max = 56000},
+};
+
+#endif // SAMSUNG_CONSUMERIR_H
