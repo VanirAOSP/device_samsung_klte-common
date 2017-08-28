@@ -21,9 +21,6 @@
 #define BTM_DEF_LOCAL_NAME   "Samsung Galaxy S5"
 #define BTIF_MAX_PCM_ITER_NUM_PER_TICK  10
 
-/* Defined if the kernel does not have support for CLOCK_BOOTTIME_ALARM */
-#define KERNEL_MISSING_CLOCK_BOOTTIME_ALARM TRUE
-
 #define BTA_DISABLE_DELAY 1000 /* in milliseconds */
 
 #define BTM_WBS_INCLUDED TRUE       /* Enable WBS */
