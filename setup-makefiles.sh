@@ -37,11 +37,15 @@ fi
 setup_vendor "$DEVICE_COMMON" "$VENDOR" "$CM_ROOT" true
 
 # Copyright headers and common guards
-write_headers "klte kltechn kltechnduo klteduos kltedv kltekdi kltekor kltespr klteusc kltevzw"
+write_headers "klte kltechn kltechnduo klteduos kltedv kltekdi kltekor kltespr kltesprsports klteusc kltevzw"
 
 write_makefiles "$MY_DIR"/common-proprietary-files.txt
 
 write_footers
+
+if [ ! -z $VARIANT_COPYRIGHT_YEAR ]; then
+    export INITIAL_COPYRIGHT_YEAR=$VARIANT_COPYRIGHT_YEAR
+fi
 
 # Reinitialize the helper for device
 setup_vendor "$DEVICE" "$VENDOR" "$CM_ROOT"
